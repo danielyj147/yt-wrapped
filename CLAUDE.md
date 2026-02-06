@@ -6,7 +6,7 @@ A "Spotify Wrapped"-style year-in-review web app for YouTube watch history. User
 
 ## Tech Stack
 
-- **Framework**: Next.js 14+ (App Router)
+- **Framework**: Next.js 16+ (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS + Framer Motion for animations
 - **Charts**: Recharts or D3.js for data visualization
@@ -39,7 +39,7 @@ youtube-wrapped/
 │   └── types/            # TypeScript type definitions
 ├── public/
 │   └── fonts/            # Custom fonts
-├── .env.local            # YouTube API key (NEXT_PUBLIC_YOUTUBE_API_KEY)
+├── .env.local            # YouTube API key (YOUTUBE_API_KEY)
 ├── CLAUDE.md
 ├── package.json
 ├── tailwind.config.ts
@@ -201,7 +201,7 @@ filter: brightness(calc((var(--hyp) + 0.7) * 0.7)) contrast(2.5) saturate(0.65);
 - Error boundaries around API-dependent components
 
 ### API Key Handling
-- YouTube API key goes in `.env.local` as `NEXT_PUBLIC_YOUTUBE_API_KEY`
+- YouTube API key goes in `.env.local` as `YOUTUBE_API_KEY` (server-side only, proxied via `/api/enrich`)
 - Never commit API keys
 - Add `.env.local` to `.gitignore`
 - Provide clear setup instructions in README

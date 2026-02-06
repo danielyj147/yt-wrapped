@@ -65,17 +65,6 @@ export default function HomePage() {
               </button>
             </motion.div>
 
-            {!process.env.NEXT_PUBLIC_YOUTUBE_API_KEY && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="text-xs text-yellow-400/70 text-center max-w-sm"
-              >
-                No YouTube API key detected. Stats will be based on watch count only (no duration/category data).
-                Add NEXT_PUBLIC_YOUTUBE_API_KEY to .env.local for full enrichment.
-              </motion.p>
-            )}
           </>
         )}
 

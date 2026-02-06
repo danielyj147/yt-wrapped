@@ -1,34 +1,4 @@
 import axios from "axios";
-import { parseDuration } from "./utils";
-import { YOUTUBE_CATEGORIES } from "@/types";
-
-interface YouTubeVideoSnippet {
-  title: string;
-  channelTitle: string;
-  channelId: string;
-  categoryId: string;
-  tags?: string[];
-}
-
-interface YouTubeVideoStats {
-  viewCount?: string;
-  likeCount?: string;
-}
-
-interface YouTubeVideoContentDetails {
-  duration: string;
-}
-
-interface YouTubeVideoItem {
-  id: string;
-  snippet: YouTubeVideoSnippet;
-  contentDetails: YouTubeVideoContentDetails;
-  statistics: YouTubeVideoStats;
-}
-
-interface YouTubeVideoResponse {
-  items: YouTubeVideoItem[];
-}
 
 export interface VideoMetadata {
   videoId: string;
@@ -106,36 +76,23 @@ export function cleanExpiredCache(): void {
   }
 }
 
-export async function fetchVideoMetadata(
-  videoIds: string[],
-  apiKey: string
-): Promise<VideoMetadata[]> {
-  const url = "https://www.googleapis.com/youtube/v3/videos";
-  const response = await axios.get<YouTubeVideoResponse>(url, {
-    params: {
-      part: "snippet,contentDetails,statistics",
-      id: videoIds.join(","),
-      key: apiKey,
-    },
-  });
+const API_BATCH_SIZE = 200; // max IDs per request to our API route
 
-  return response.data.items.map((item) => ({
-    videoId: item.id,
-    title: item.snippet.title,
-    channelName: item.snippet.channelTitle,
-    channelId: item.snippet.channelId,
-    durationSeconds: parseDuration(item.contentDetails.duration),
-    categoryId: item.snippet.categoryId,
-    categoryName: YOUTUBE_CATEGORIES[item.snippet.categoryId] || "Other",
-    tags: item.snippet.tags || [],
-    viewCount: parseInt(item.statistics.viewCount || "0", 10),
-    likeCount: parseInt(item.statistics.likeCount || "0", 10),
-  }));
+async function fetchFromApi(videoIds: string[]): Promise<VideoMetadata[]> {
+  const response = await axios.post<{ data: VideoMetadata[]; error?: string }>(
+    "/api/enrich",
+    { ids: videoIds }
+  );
+
+  if (response.data.error) {
+    throw new Error(response.data.error);
+  }
+
+  return response.data.data;
 }
 
 export async function fetchVideoMetadataBatch(
   videoIds: string[],
-  apiKey: string,
   onProgress?: (fetched: number, total: number) => void
 ): Promise<Map<string, VideoMetadata>> {
   const result = new Map<string, VideoMetadata>();
@@ -150,20 +107,19 @@ export async function fetchVideoMetadataBatch(
     }
   }
 
-  const BATCH_SIZE = 50;
   let fetched = result.size;
   onProgress?.(fetched, videoIds.length);
 
-  for (let i = 0; i < uncachedIds.length; i += BATCH_SIZE) {
-    const batch = uncachedIds.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < uncachedIds.length; i += API_BATCH_SIZE) {
+    const batch = uncachedIds.slice(i, i + API_BATCH_SIZE);
     try {
-      const metadata = await fetchVideoMetadata(batch, apiKey);
+      const metadata = await fetchFromApi(batch);
       for (const m of metadata) {
         result.set(m.videoId, m);
         setCache(m.videoId, m);
       }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 403) {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
         throw new Error("YouTube API quota exceeded. Try again tomorrow or use a different API key.");
       }
       // skip failed batch silently for other errors

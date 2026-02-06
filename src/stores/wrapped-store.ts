@@ -55,22 +55,24 @@ export const useWrappedStore = create<WrappedStore>((set, get) => ({
         return;
       }
 
-      set({ parsedEntries: parsed, year });
-
-      const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+      set({ parsedEntries: parsed, year, stage: "enriching" });
 
       let enriched: EnrichedVideo[];
 
-      if (apiKey) {
-        set({ stage: "enriching" });
+      try {
         enriched = await enrichWatchHistory(
           parsed,
-          apiKey,
           (fetched, total) => {
             set({ enrichProgress: { fetched, total } });
           }
         );
-      } else {
+      } catch {
+        // API route unavailable or no API key configured — fall back to parsed data
+        enriched = createEnrichedFromParsed(parsed);
+      }
+
+      // If enrichment returned nothing (e.g. all API calls failed), fall back
+      if (enriched.length === 0) {
         enriched = createEnrichedFromParsed(parsed);
       }
 
