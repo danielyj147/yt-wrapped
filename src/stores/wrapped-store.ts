@@ -10,6 +10,7 @@ import { parseWatchHistory, detectYear } from "@/lib/parser";
 import { enrichWatchHistory, createEnrichedFromParsed } from "@/lib/enricher";
 import { analyzeWatchHistory } from "@/lib/analyzer";
 import { generateDemoData } from "@/lib/demo-data";
+import { cleanExpiredCache } from "@/lib/youtube-api";
 
 interface WrappedStore {
   stage: AppStage;
@@ -23,6 +24,11 @@ interface WrappedStore {
   processFile: (file: File) => Promise<void>;
   loadDemo: () => void;
   reset: () => void;
+}
+
+// Clean expired cache entries on module load
+if (typeof window !== "undefined") {
+  cleanExpiredCache();
 }
 
 export const useWrappedStore = create<WrappedStore>((set, get) => ({
