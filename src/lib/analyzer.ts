@@ -7,8 +7,9 @@ import type {
   HourDayStat,
   MonthlyStat,
   BingeSession,
+  ShortsStats,
 } from "@/types";
-import { getGenrePersonality } from "./utils";
+import { getGenrePersonality, isShort } from "./utils";
 
 export function analyzeWatchHistory(
   videos: EnrichedVideo[],
@@ -42,6 +43,7 @@ export function analyzeWatchHistory(
   const { lateNightCount, lateNightSeconds } = computeLateNightStats(sorted);
   const bingeSessions = computeBingeSessions(sorted);
   const genrePersonality = getGenrePersonality(topCategories);
+  const shortsStats = computeShortsStats(sorted);
 
   return {
     totalVideos,
@@ -59,6 +61,7 @@ export function analyzeWatchHistory(
     genrePersonality,
     firstVideo,
     lastVideo,
+    shortsStats,
     year,
   };
 }
@@ -247,4 +250,26 @@ function computeBingeSessions(videos: EnrichedVideo[]): BingeSession[] {
   }
 
   return sessions.sort((a, b) => b.videoCount - a.videoCount).slice(0, 10);
+}
+
+function computeShortsStats(videos: EnrichedVideo[]): ShortsStats {
+  const shorts = videos.filter(isShort);
+  const shortsCount = shorts.length;
+  const shortsWatchTimeSeconds = shorts.reduce((s, v) => s + v.durationSeconds, 0);
+  const shortsPercentage = videos.length > 0 ? (shortsCount / videos.length) * 100 : 0;
+
+  const channelMap = new Map<string, { watchCount: number; totalSeconds: number }>();
+  for (const v of shorts) {
+    const existing = channelMap.get(v.channelName) || { watchCount: 0, totalSeconds: 0 };
+    existing.watchCount++;
+    existing.totalSeconds += v.durationSeconds;
+    channelMap.set(v.channelName, existing);
+  }
+
+  const topShortsChannels = [...channelMap.entries()]
+    .map(([name, stats]) => ({ name, ...stats }))
+    .sort((a, b) => b.watchCount - a.watchCount)
+    .slice(0, 5);
+
+  return { shortsCount, shortsWatchTimeSeconds, shortsPercentage, topShortsChannels };
 }

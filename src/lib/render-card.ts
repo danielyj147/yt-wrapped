@@ -220,6 +220,23 @@ export function renderSummaryCard(stats: WrappedStats): string {
     ctx.fillText(`Night Owl — ${stats.lateNightCount} late-night videos`, cx, y + 1);
   }
 
+  // Shorts scroller badge
+  if (stats.shortsStats.shortsCount > 10) {
+    y += 42;
+    const badgeW = 280;
+    const badgeH = 32;
+    roundRect(ctx, cx - badgeW / 2, y - 18, badgeW, badgeH, 16);
+    ctx.fillStyle = "rgba(236, 72, 153, 0.15)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(236, 72, 153, 0.3)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.font = "500 12px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "#f9a8d4";
+    ctx.fillText(`Shorts Scroller — ${stats.shortsStats.shortsCount} shorts watched`, cx, y + 1);
+  }
+
   // Footer
   ctx.font = "500 12px Inter, system-ui, sans-serif";
   ctx.fillStyle = "rgba(255, 255, 255, 0.2)";

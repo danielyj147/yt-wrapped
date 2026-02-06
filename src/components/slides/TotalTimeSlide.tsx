@@ -8,12 +8,15 @@ import { funComparison } from "@/lib/utils";
 interface TotalTimeSlideProps {
   totalVideos: number;
   totalWatchTimeSeconds: number;
+  shortsCount?: number;
 }
 
 export function TotalTimeSlide({
   totalVideos,
   totalWatchTimeSeconds,
+  shortsCount = 0,
 }: TotalTimeSlideProps) {
+  const regularCount = totalVideos - shortsCount;
   const totalHours = Math.round(totalWatchTimeSeconds / 3600);
   const displayHours = useCountUp(totalHours, 2500);
   const displayVideos = useCountUp(totalVideos, 2000);
@@ -42,6 +45,11 @@ export function TotalTimeSlide({
           <p className="text-2xl md:text-3xl font-bold text-white/80 mt-2">
             videos
           </p>
+          {shortsCount > 0 && (
+            <p className="text-sm text-white/30 mt-1">
+              {regularCount.toLocaleString()} regular + {shortsCount.toLocaleString()} shorts
+            </p>
+          )}
         </motion.div>
 
         {totalWatchTimeSeconds > 0 && (

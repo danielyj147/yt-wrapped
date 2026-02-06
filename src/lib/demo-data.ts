@@ -31,6 +31,17 @@ const CATEGORIES: Array<{ id: string; name: string; weight: number }> = [
   { id: "23", name: "Comedy", weight: 4 },
 ];
 
+const SHORTS_TITLES = [
+  "Wait for it... 😱",
+  "This hack changed my life #shorts",
+  "POV: You're a programmer",
+  "One minute science experiment",
+  "Did you know this about space?",
+  "Satisfying code compilation",
+  "AI generated this in 10 seconds",
+  "The shortest explanation of quantum physics",
+];
+
 const VIDEO_TITLES = [
   "How This Algorithm Changed the Internet",
   "I Built a Robot That Solves Any Puzzle",
@@ -172,24 +183,30 @@ export function generateDemoData(): EnrichedVideo[] {
 
     // Duration: 3-45 min for most, some shorts (<1min), some long (>1hr)
     let durationSeconds: number;
+    let isShortVideo = false;
     const durRand = rand();
     if (durRand < 0.1) {
       durationSeconds = 15 + Math.floor(rand() * 45); // shorts
+      isShortVideo = true;
     } else if (durRand < 0.85) {
       durationSeconds = 180 + Math.floor(rand() * 2520); // 3-45 min
     } else {
       durationSeconds = 2700 + Math.floor(rand() * 5400); // 45-135 min
     }
 
+    // Tag ~70% of short-duration videos with Shorts category
+    const finalCatId = isShortVideo && rand() < 0.7 ? "42" : cat.id;
+    const finalCatName = finalCatId === "42" ? "Shorts" : cat.name;
+
     videos.push({
       videoId,
-      title: pickRandom(VIDEO_TITLES, rand),
+      title: isShortVideo ? pickRandom(SHORTS_TITLES, rand) : pickRandom(VIDEO_TITLES, rand),
       channelName: channel.name,
       channelId: channel.id,
       watchedAt,
       durationSeconds,
-      categoryId: cat.id,
-      categoryName: cat.name,
+      categoryId: finalCatId,
+      categoryName: finalCatName,
       tags: [],
       viewCount: Math.floor(rand() * 10_000_000),
       likeCount: Math.floor(rand() * 500_000),

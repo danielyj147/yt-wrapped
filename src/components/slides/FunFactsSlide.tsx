@@ -42,6 +42,26 @@ export function FunFactsSlide({ stats }: FunFactsSlideProps) {
     });
   }
 
+  const shortsPercent = Math.round(stats.shortsStats.shortsPercentage);
+  if (stats.shortsStats.shortsCount > 0) {
+    if (shortsPercent >= 20) {
+      facts.push({
+        emoji: "📱",
+        text: `${shortsPercent}% of your videos were Shorts — you're a scroller!`,
+      });
+    } else if (shortsPercent < 5) {
+      facts.push({
+        emoji: "🎬",
+        text: `Only ${shortsPercent}% Shorts — you're a long-form loyalist`,
+      });
+    } else {
+      facts.push({
+        emoji: "📱",
+        text: `${stats.shortsStats.shortsCount} Shorts watched (${shortsPercent}% of your total)`,
+      });
+    }
+  }
+
   const avgPerDay = Math.round(stats.totalVideos / stats.activeDays);
   if (avgPerDay > 0) {
     facts.push({

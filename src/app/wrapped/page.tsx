@@ -14,6 +14,7 @@ import { TopCategorySlide } from "@/components/slides/TopCategorySlide";
 import { CategoryBreakdownSlide } from "@/components/slides/CategoryBreakdownSlide";
 import { WatchingClockSlide } from "@/components/slides/WatchingClockSlide";
 import { MonthlyJourneySlide } from "@/components/slides/MonthlyJourneySlide";
+import { ShortsSlide } from "@/components/slides/ShortsSlide";
 import { LateNightSlide } from "@/components/slides/LateNightSlide";
 import { MostRewatchedSlide } from "@/components/slides/MostRewatchedSlide";
 import { FunFactsSlide } from "@/components/slides/FunFactsSlide";
@@ -39,6 +40,7 @@ export default function WrappedPage() {
         key="total"
         totalVideos={stats.totalVideos}
         totalWatchTimeSeconds={stats.totalWatchTimeSeconds}
+        shortsCount={stats.shortsStats.shortsCount}
       />,
     ];
 
@@ -83,6 +85,12 @@ export default function WrappedPage() {
         monthlyTrends={stats.monthlyTrends}
       />
     );
+
+    if (stats.shortsStats.shortsCount > 0) {
+      s.push(
+        <ShortsSlide key="shorts" shortsStats={stats.shortsStats} />
+      );
+    }
 
     if (stats.lateNightCount > 0) {
       s.push(

@@ -63,6 +63,13 @@ export interface BingeSession {
   videos: EnrichedVideo[];
 }
 
+export interface ShortsStats {
+  shortsCount: number;
+  shortsWatchTimeSeconds: number;
+  shortsPercentage: number;
+  topShortsChannels: ChannelStat[];
+}
+
 export interface WrappedStats {
   totalVideos: number;
   totalWatchTimeSeconds: number;
@@ -79,6 +86,7 @@ export interface WrappedStats {
   genrePersonality: string;
   firstVideo: EnrichedVideo | null;
   lastVideo: EnrichedVideo | null;
+  shortsStats: ShortsStats;
   year: number;
 }
 

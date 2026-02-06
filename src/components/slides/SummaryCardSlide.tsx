@@ -88,14 +88,19 @@ export function SummaryCardSlide({ stats }: SummaryCardSlideProps) {
               </p>
             </div>
 
-            {/* Late night badge */}
-            {stats.lateNightCount > 20 && (
-              <div className="mt-4 flex justify-center">
+            {/* Badges */}
+            <div className="mt-4 flex flex-col items-center gap-2">
+              {stats.lateNightCount > 20 && (
                 <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded-full border border-indigo-500/30">
                   🌙 Night Owl — {stats.lateNightCount} late-night videos
                 </span>
-              </div>
-            )}
+              )}
+              {stats.shortsStats.shortsCount > 10 && (
+                <span className="text-[10px] bg-pink-500/20 text-pink-300 px-2 py-1 rounded-full border border-pink-500/30">
+                  📱 Shorts Scroller — {stats.shortsStats.shortsCount} shorts watched
+                </span>
+              )}
+            </div>
           </div>
         </HoloCard>
       </motion.div>

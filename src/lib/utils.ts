@@ -71,6 +71,10 @@ export function getGenrePersonality(topCategories: Array<{ name: string }>): str
   return "The YouTube Explorer";
 }
 
+export function isShort(video: { categoryId: string; durationSeconds: number }): boolean {
+  return video.categoryId === "42" || video.durationSeconds <= 60;
+}
+
 export function chunk<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
